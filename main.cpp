@@ -48,8 +48,8 @@ public:
 
 int main(int argc, char* argv[])
 {
-
     TaskBag bag(P,argc,argv);//используем P рабочих процессов(не используется в MPI)
+
     // инициализация
     for(int i=0;i<N;i++)
         for(int j=0;j<N;j++)a[i][j]=N*i+j;
@@ -98,4 +98,5 @@ int main(int argc, char* argv[])
         cout<<'\n';
     }
     return 0;
+
 }
