@@ -5,11 +5,11 @@
 //////////////////////////////////////////////////////////////
 
 #include "tbag.h"
-#include <assert.h>
+#include <cassert>
 
 namespace TEMPLET {
 
-    TBag::TBag(int num_prc,int argc, char* argv[])
+    TBag::TBag(int num_prc)
     {
         nproc=num_prc;
 
@@ -17,7 +17,7 @@ namespace TEMPLET {
         thread=new HANDLE[nproc];
 
         InitializeCriticalSection(&cs);
-        await=CreateEvent(NULL,FALSE,FALSE,NULL);//auto,non-signaled
+        await=CreateEvent(nullptr,FALSE,FALSE,nullptr);//auto,non-signaled
         assert(await);
 
         _duration=0.0;
@@ -28,7 +28,7 @@ namespace TEMPLET {
         TBag::Task* task;
 
         EnterCriticalSection(&b->cs);
-        task=b->task[b->cur_task++];
+        task=b->task[b->cur_task+=1];
         for(;;){
             while(!b->if_job()){
                 if(!b->c_active){
@@ -41,13 +41,13 @@ namespace TEMPLET {
                 EnterCriticalSection(&b->cs);
             }
             b->get(task);
-            b->c_active++;
+            b->c_active+=1;
             LeaveCriticalSection(&b->cs);
 
             b->proc(task);
 
             EnterCriticalSection(&b->cs);
-            b->c_active--;
+            b->c_active-=1;
             b->put(task);
             SetEvent(b->await);
         }
@@ -69,7 +69,7 @@ namespace TEMPLET {
 
         for(int i=0;i<nproc;i++){
             task[i]=createTask();
-            thread[i]=CreateThread(NULL,0,tFunc,this,0,&id);
+            thread[i]=CreateThread(nullptr,0,tFunc,this,0,&id);
             assert(thread[i]&&task[i]);
         }
 
@@ -82,7 +82,7 @@ namespace TEMPLET {
         WaitForMultipleObjects(nproc,thread,TRUE,INFINITE);
 
         QueryPerformanceCounter(&t2);
-        _duration=(double)(t2.QuadPart-t1.QuadPart)/frequency.QuadPart;
+        _duration=(double)(t2.QuadPart-t1.QuadPart)/(double )frequency.QuadPart;
 
         for(int i=0;i<nproc;i++){
             CloseHandle(thread[i]);

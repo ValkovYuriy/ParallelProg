@@ -4,8 +4,8 @@
 //	Copyright (c) 2010-2013 Востокин Сергей Владимирович	//
 //////////////////////////////////////////////////////////////
 
-#ifndef _TASK_BAG_RUN_TIME
-#define _TASK_BAG_RUN_TIME
+#ifndef TASK_BAG_RUN_TIME
+#define TASK_BAG_RUN_TIME
 
 #include <windows.h>
 
@@ -16,12 +16,14 @@ namespace TEMPLET {
     public:
         class Task{
         public:
-            virtual~Task(){}
-            void send(void*,size_t){}
-            void recv(void*,size_t){}
+            virtual~Task()= default;
+
+            [[maybe_unused]] void send(void*,size_t){}
+
+            [[maybe_unused]] void recv(void*,size_t){}
         };
     public:
-        TBag(int num_prc,int argc=0, char* argv[]=0);
+        explicit TBag(int num_prc);
         virtual ~TBag();
         virtual Task* createTask()=0;
 
@@ -31,17 +33,17 @@ namespace TEMPLET {
         virtual void get(Task*)=0;
         virtual void proc(Task*)=0;
 
-        double speedup(){return nproc;};
-        double duration(){return _duration;};
+        [[maybe_unused]] [[nodiscard]] double speedup() const{return nproc;};
+        [[nodiscard]] double duration() const{return _duration;};
 
     private:
         Task** task;
         HANDLE* thread;
         int nproc;
-        volatile int c_active;
-        volatile int cur_task;
+        volatile int c_active{};
+        volatile int cur_task{};
         HANDLE await;
-        CRITICAL_SECTION cs;
+        CRITICAL_SECTION cs{};
         double _duration;
     };
 
