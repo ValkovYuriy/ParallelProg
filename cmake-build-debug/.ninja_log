@@ -1,0 +1,4 @@
+# ninja log v6
+5	1057	7632936144728821	CMakeFiles/ParallelProg.dir/tbag.cpp.obj	6d602002f1785231
+1	1428	7632936144689717	CMakeFiles/ParallelProg.dir/TaskBag.cpp.obj	4d2cd632f302b55c
+1429	1635	7632936158972526	ParallelProg.exe	68224bf19bf2af73
