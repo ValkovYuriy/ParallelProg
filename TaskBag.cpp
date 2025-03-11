@@ -5,8 +5,11 @@
 #include <chrono>
 #include <random>
 
-const int N = 1000000;
-const int P = 10;
+#define COUNT 1000
+
+const int N = 10000;
+const int P = 6;
+const int T = 10;
 int arr[N];
 
 struct task {
@@ -52,8 +55,18 @@ void qSort0(bag *b, int *a, int size) {
         }
     } while (i <= j);
 
-    if (j > 0) b->taskQueue.push(task(a, j + 1));
-    if (size > i)b->taskQueue.push(task(a + i, size - i));
+    if (j > 0) {
+        if (j + 1 < T && b->taskQueue.size() < P)
+            b->taskQueue.push(task(a, j + 1));
+        else
+            qSort0(b, a, j + 1);
+    }
+    if (size > i) {
+        if (size - i < T && b->taskQueue.size() < P)
+            b->taskQueue.push(task(a + i, size - i));
+        else
+            qSort0(b, a, size - i);
+    }
 }
 
 class TaskBag : public TEMPLET::TBag {
@@ -76,16 +89,22 @@ public:
     };
 
 public:
-    bag b;
+    bag b{};
+    double real_time_milliseconds = 0.0;
 
     explicit TaskBag(int num_prc) : TBag(num_prc) {
+        struct timespec start{}, end{};
         unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
         std::mt19937 generator(seed);
         std::uniform_int_distribution<int> distribution(1, N);
-        for (int & i : arr) {
+        for (int &i: arr) {
             i = distribution(generator);
         }
+        clock_gettime(CLOCK_REALTIME, &start);
         qSort0(&b, arr, N);
+        clock_gettime(CLOCK_REALTIME, &end);
+        double real_time = (double) (end.tv_sec - start.tv_sec) + (end.tv_nsec - start.tv_nsec) / 1e9;
+        real_time_milliseconds = real_time * 1000;
     }
 
     ~TaskBag() override = default;
@@ -111,12 +130,19 @@ public:
 };
 
 int _tmain() {
-    TaskBag bag(P);
+/*    TaskBag bag(P);
     bag.run();
     //std::cout<<"\nspeedup = "<<bag.speedup();//1-при логической отладке,
 
-    //for (int i = 0; i < N; i++) std::cout << i << ") " << arr[i] << '\n';
-    std::cout << "\nduration = " << bag.duration() << " sec\n";
+    for (int i = 0; i < N; i++) std::cout << i << ") " << arr[i] << '\n';
+    std::cout << "\nduration = " << bag.duration() << " sec\n";*/
+    double real_time_milliseconds = 0.0;
+    for (int count = 0; count < COUNT; count++) {
+        TaskBag bag(P);
+        bag.run();
+        real_time_milliseconds += bag.duration() * 1000 + (double) bag.real_time_milliseconds;
+    }
+    printf("AVG exec time: %f ms\n", real_time_milliseconds / COUNT);
     return 0;
 }
 
