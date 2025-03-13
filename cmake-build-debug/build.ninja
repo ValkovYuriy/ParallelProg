@@ -71,6 +71,7 @@ build CMakeFiles/ParallelProg.dir/tbag.cpp.obj: CXX_COMPILER__ParallelProg_unsca
 
 build ParallelProg.exe: CXX_EXECUTABLE_LINKER__ParallelProg_Debug CMakeFiles/ParallelProg.dir/TaskBag.cpp.obj CMakeFiles/ParallelProg.dir/tbag.cpp.obj
   FLAGS = -g
+  LINK_FLAGS = -Wl,--stack=4294967295
   LINK_LIBRARIES = -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32
   OBJECT_DIR = CMakeFiles\ParallelProg.dir
   POST_BUILD = cd .
