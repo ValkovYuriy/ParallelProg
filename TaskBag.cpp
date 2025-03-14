@@ -112,7 +112,6 @@ public:
 
     TBag::Task *createTask() override { return new TaskBagTask; }
 
-    //std::queue<struct task> taskQueue;
 
     bool if_job() override { return !b.taskQueue.empty(); }
 
@@ -131,11 +130,13 @@ public:
 };
 
 int _tmain() {
-    std::ofstream outputFile("results.csv");
+    std::ofstream outputFile("results.csv"); // Создаем файл
     if (!outputFile.is_open()) {
         std::cerr << "File error" << std::endl;
         return 1;
     }
+
+    // Записываем заголовки
     outputFile << "N,P,AVG_SERIAL_TIME,AVG_PARALLEL_TIME\n";
     for (; N <= 10000000; N *= 10) {
         printf("N: %d\n", N);
@@ -161,12 +162,6 @@ int _tmain() {
             real_time_milliseconds = 0.0;
             printf("P: %d\n", P);
             for (int count = 0; count < COUNT; count++) {
-                unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
-                std::mt19937 generator(seed);
-                std::uniform_int_distribution<int> distribution(1, N);
-                for (int &i: arr) {
-                    i = distribution(generator);
-                }
                 int *ptr = arr;
                 TaskBag bag(P, ptr);
                 bag.run();
@@ -174,7 +169,7 @@ int _tmain() {
             }
             double parallel_time = real_time_milliseconds / COUNT;
             printf("AVG parallel time: %f ms\n", parallel_time);
-            outputFile << N << "," << P  << "," << serial_time << ","  << parallel_time << "\n";
+            outputFile << N << "," << P << "," << serial_time << "," << parallel_time<< "\n"; // Запись в CSV (P=0 для последовательного)
         }
     }
     outputFile.close();
